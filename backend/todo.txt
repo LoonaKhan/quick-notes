@@ -6,7 +6,8 @@ where do these api routes go?
       append a note to the user's inbox
   delete a note from a user's inbox
     delete from user inbox
-      
+
+  maybe make their own routes file
 
 
 inbox note object?
@@ -14,4 +15,8 @@ inbox note object?
   noteId: note.id
   inbox: user.id
 }
+
+
+
+routes for webpages that just serve html
 
