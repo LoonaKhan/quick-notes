@@ -1,0 +1,17 @@
+where do these api routes go?
+  share a note (get note, send to another user)
+      only if you own the note
+        get request for note 
+        checks if note.author.id = user.id
+      append a note to the user's inbox
+  delete a note from a user's inbox
+    delete from user inbox
+      
+
+
+inbox note object?
+{
+  noteId: note.id
+  inbox: user.id
+}
+
