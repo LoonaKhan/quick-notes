@@ -1,3 +1,8 @@
+/*
+  * server file.
+  * created oct 27 2022
+*/
+
 const express = require('express')
 const app = express()
 const {PORT} = require('./config.json')
