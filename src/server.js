@@ -4,19 +4,22 @@
 */
 
 const express = require('express')
-const app = express()
 const {PORT} = require('./config.json')
 const path = require('path')
+const sequelize = require('./database/db')
 
+const app = express() // init express
+app.use(express.json()) // allows us to parse json requests
+sequelize.sync().then(() => console.log('db on')) // init sqlite
 
 
 // API ROUTES
 
 const usersRoutes = require('./routes/users.js')
-app.use('api/users', usersRoutes)
+app.use('/api/users', usersRoutes)
 
 const notesRoutes = require('./routes/notes.js')
-app.use('api/notes', notesRoutes)
+app.use('/api/notes', notesRoutes)
 
 
 // WEBPAGES
