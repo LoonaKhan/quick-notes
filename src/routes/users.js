@@ -15,6 +15,7 @@ const router = Router()
 router.get('/:id', async (req, res) => {
     const id = req.params.id
     const user = await User.findOne({where: {id: id}})
+    console.log(user)
     res.send(user)
 })
 
