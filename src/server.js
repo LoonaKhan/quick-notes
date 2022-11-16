@@ -10,7 +10,7 @@ const sequelize = require('./database/db')
 
 const app = express() // init express
 app.use(express.json()) // allows us to parse json requests
-sequelize.sync().then(() => console.log('db on')) // init sqlite
+sequelize.sync().then(() => console.log('db on')) // init sqlite and syncs all tables
 
 
 // API ROUTES
@@ -20,6 +20,9 @@ app.use('/api/users', usersRoutes)
 
 const notesRoutes = require('./routes/notes.js')
 app.use('/api/notes', notesRoutes)
+
+const foldersRoutes = require('./routes/folders')
+app.use('/api/folders', foldersRoutes)
 
 
 // WEBPAGES

@@ -4,6 +4,7 @@
 
 const { Router } = require('express')
 const User = require('../database/User')
+const Folder = require('../database/Folder')
 
 const router = Router()
 
@@ -28,7 +29,8 @@ router.post('/create', async (req, res) => {
     //const {username, password, avatar, dark_mode} = req.body
     //const inbox = []
 
-    User.create(req.body)
+    const user = User.create(req.body)
+    Folder.create({name: "inbox", owner:user})
 
     res.send({msg: "successfully created"})
 })
@@ -56,7 +58,7 @@ router.put('/edit/dark_mode/:id', async (req, res) => {
 })
 
 // delete
-router.delete('/delete/:id', async (req, res) => {
+router.delete('/del/:id', async (req, res) => {
     const id = req.params.id
     await User.destroy({where: {id:id}})
     res.send({msg: "deletion successful"})

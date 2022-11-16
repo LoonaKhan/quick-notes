@@ -17,6 +17,9 @@ inbox note object?
 }
 
 
+foreign keys
+folder methods
+
 
 routes for webpages that just serve html
 

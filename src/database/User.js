@@ -4,6 +4,11 @@ const sequelize = require('./db')
 class User extends Model {}
 
 User.init({ // todo: let charlie override this
+    id:{
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
     username: {
         type: DataTypes.STRING
     },
@@ -19,7 +24,8 @@ User.init({ // todo: let charlie override this
 },
     {
         sequelize,
-        modelName: 'user'
+        modelName: 'USERS',
+        tableName: 'USERS'
     })
 
 module.exports = User
