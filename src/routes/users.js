@@ -12,12 +12,14 @@ const router = Router()
 
 // API ROUTES
 
-// gets a user by id
-router.get('/:id', async (req, res) => {
-    const id = req.params.id
-    const user = await User.findOne({where: {id: id}})
-    console.log(user)
-    res.send(user)
+// gets a user by login credentials
+router.get('/', async (req, res) => {
+    const {username, password} = req.body
+    const user = await User.findOne({where: {username:username, password:password}})
+    if (!user){
+        res.status(400).send({err: "Could not find user"})
+    }
+    else res.send(user)
 })
 
 // creates a user
@@ -26,13 +28,15 @@ router.post('/create', async (req, res) => {
         takes in a name, password and avatar.
         creates an inbox and dark_mode setting on its own
      */
-    //const {username, password, avatar, dark_mode} = req.body
-    //const inbox = []
 
-    const user = User.create(req.body)
-    Folder.create({name: "inbox", owner:user})
-
-    res.send({msg: "successfully created"})
+    const user = await User.create(req.body)
+    if(!user) {
+        res.status(400).send({err:"Couldnt find user"})
+    }
+    else{
+        await Folder.create({name: "inbox", owner: user.id})
+        res.send({msg: "successfully created"})
+    }
 })
 
 // logs a user in
@@ -42,26 +46,40 @@ router.put('/login/:id', async (req, res) => {})
 // requires a new password.
 router.put('/edit/password/:id', async (req, res) => {
     const id = req.params.id
-    const user = await User.findOne({where: {id:id}})
-    user.password = req.body.password
-    await user.save()
-    res.send({msg: "updated"})
+
+    const user = await User.findOne({where: {id: id}})
+    if (!user) {
+        res.status(400).send({err:"Couldnt find user"})
+    }
+    else {
+        user.password = req.body.password
+        await user.save()
+        res.send({msg: "updated"})
+    }
 })
 
 // change user setting to dark mode
 router.put('/edit/dark_mode/:id', async (req, res) => {
     const id = req.params.id
-    const user = await User.findOne({where: {id:id}})
-    user.dark_mode = req.body.dark_mode
-    await user.save()
-    res.send({msg: "updated"})
+
+    const user = await User.findOne({where: {id: id}})
+    if (!user) {
+        res.status(400).send({err:"Couldnt find user"})
+    }
+    else {
+        user.dark_mode = req.body.dark_mode
+        await user.save()
+        res.send({msg: "updated"})
+    }
 })
 
 // delete
 router.delete('/del/:id', async (req, res) => {
     const id = req.params.id
-    await User.destroy({where: {id:id}})
-    res.send({msg: "deletion successful"})
+    if (!(await User.destroy({where: {id: id}}))) {
+        res.status(400).send({err: "could not delete user"})
+    }
+    else res.send({msg: "deletion successful"})
 })
 
 

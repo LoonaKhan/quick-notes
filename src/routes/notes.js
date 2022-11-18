@@ -16,14 +16,14 @@ const router = Router()
 router.get('/:id', async (req, res) => {
     const id = req.params.id
 
-    const note = Note.findOne({where: {id:id}})
+    const note = await Note.findOne({where: {id:id}})
     res.send(note)
 })
 
 // get all notes in a folder
 router.get('/folder/:id/', async (req, res) => {
     const id = req.params.id
-    const notes = Note.findAll({where: {folder:id}})
+    const notes = await Note.findAll({where: {folder:id}})
     res.send(notes)
 })
 
@@ -32,18 +32,10 @@ router.post('/create', async (req, res) => {
     /*
     Requires a uid, folder name, content and title fo the note
      */
-    const {uid, folder, content, title} = req.body;
+    // todo: the folder/user may not exist. add error
 
-    // folder is the folder id
-    // has to exist
-    let fid =Folder.findOne({where: {user:uid, name:folder}})
-
-    const note = Note.create({
-        author: uid,
-        folder: fid,
-        title: title,
-        content: content
-    })
+    const note = await Note.create(req.body)
+    res.status(201).send(note)
 })
 
 // edits a note
@@ -52,10 +44,10 @@ router.put('/edit/:id', async (req, res) => {
     const {newTitle, newContent} = req.body
 
     try {
-        const note = Note.findOne({where: {id:id}})
+        const note = await Note.findOne({where: {id:id}})
 
-        if (newTitle) note.title = newTitle
-        if (newContent) note.content = newContent
+        note.title = newTitle
+        note.content = newContent
 
         await note.save()
 
@@ -70,8 +62,8 @@ router.delete('/del/:id', async (req, res) => {
     const id = req.params.id
 
     try {
-        Note.destroy({where:{id:id}})
-        res.status(201).send({msg:"Destroyed Note"})
+        await Note.destroy({where:{id:id}})
+        res.status(201).send({msg:"Deleted Note"})
     } catch (e) {
         res.status(400).send({msg: "note not found", err:e})
     }
@@ -80,19 +72,19 @@ router.delete('/del/:id', async (req, res) => {
 // send a copy of a note to an inbox
 // requires a note id and the recipient's id
 router.post('/send/:note_id', async (req, res) =>{
-    // todo: implement this
     const note_id = req.params.note_id
-    const {uid, recipient} = req.body
+    const {inbox} = req.body
 
     try {
-        const note = Note.findOne({where: {id: note_id}})
-        // find the user's inbox folder, inbox todo: implement folder methods
-        const sent_note = Note.create({
+        const note = await Note.findOne({where: {id: note_id}})
+        const sent_note = await Note.create({
             author: note.author,
             folder: inbox,
             content: note.content,
-            title: note.title
+            title: note.title,
+            owner: note.owner
         })
+        res.status(201).send(sent_note)
     } catch (e) {
         res.status(400).send(e)
     }

@@ -16,7 +16,7 @@ User.init({ // todo: let charlie override this
         type: DataTypes.BOOLEAN
     },
     avatar: {
-        type: DataTypes.STRING
+        type: DataTypes.INTEGER
     },
     password: {
         type: DataTypes.STRING

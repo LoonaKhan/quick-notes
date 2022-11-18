@@ -8,31 +8,32 @@ const router = Router()
 router.get('/user/search/:id', async (req, res) => {
     const uid = req.params.id
     const {name} = req.body
-    try {
-        const user = User.findOne({where: {id:uid}})
-        const folders = Folder.findAll({where: {owner: user, name:name}})
-        res.status(201).send(folders)
-    } catch (e) {
-        res.status(500).send({msg: "internal server error", err:e})
+
+    const folders = await Folder.findOne({where: {owner: uid, name:name}})
+    if (!folders) {
+        res.status(400).send({err:"Folder not found"})
     }
+    else res.status(201).send(folders)
 })
 
 // get a folder by id
 router.get('/:id', async (req, res) => {
     const id = req.params.id
-    try {
-        const folder = Folder.findOne({where: {id:id}})
-    } catch (e) {
-        res.status(400).send({msg: "folder not found", err:e})
+
+    const folder = await Folder.findOne({where: {id:id}})
+    if (!folder) {
+        res.status(400).send({err:"Folder not found"})
     }
+    else res.status(201).send(folder)
+
 })
 
 // get all a user's folders
 router.get('/user/:id', async (req, res) => {
     const uid = req.params.id
     try {
-        const user = User.findOne({where: {id:uid}})
-        const folders = Folder.findAll({where: {owner: user}})
+        const user = await User.findOne({where: {id:uid}})
+        const folders = await Folder.findAll({where: {owner: user.id}})
         res.status(201).send(folders)
     } catch (e) {
         res.status(500).send({msg: "internal server error", err:e})
@@ -43,8 +44,7 @@ router.get('/user/:id', async (req, res) => {
 router.get('/user/inbox/:id', async (req, res) => {
     const uid = req.params.id
     try {
-        const user = User.findOne({where: {id:uid}})
-        const folders = Folder.findAll({where: {owner: user, name: "inbox"}})
+        const folders = await Folder.findOne({where: {owner: uid, name: "inbox"}})
         res.status(201).send(folders)
     } catch (e) {
         res.status(500).send({msg: "internal server error", err:e})
@@ -55,10 +55,10 @@ router.get('/user/inbox/:id', async (req, res) => {
 router.post('/create', async (req, res) => {
     const {uid, name} = req.body
     try {
-        Folder.create({name: name, owner: uid})
+        await Folder.create({name: name, owner: uid})
         res.status(201).send({msg: "Created Folder"})
     } catch (e) {
-        res.status(500).send(e)
+        res.status(400).send({err:"Could not create folder"})
     }
 })
 
@@ -68,7 +68,7 @@ router.put('/edit/:id', async (req, res) => {
     const {name} = req.body
 
     try {
-        const folder = Folder.findOne({where: {id: id}})
+        const folder = await Folder.findOne({where: {id: id}})
         folder.name = name
         await folder.save()
 
@@ -83,7 +83,8 @@ router.delete('/del/:id', async (req, res) => {
     const id = req.params.id
 
     try {
-        Folder.destroy({where:{id:id}})
+        await Folder.destroy({where:{id:id}})
+        res.status(201).send({msg:"Created folder"})
     } catch (e) {
         res.status(400).send({msg: "could not delete folder", err:e})
     }
