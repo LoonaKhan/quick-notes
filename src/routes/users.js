@@ -22,6 +22,8 @@ router.get('/', async (req, res) => {
     else res.send(user)
 })
 
+// get user by name
+
 // creates a user
 router.post('/create', async (req, res) => {
     /*
