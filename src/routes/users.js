@@ -23,6 +23,14 @@ router.get('/', async (req, res) => {
 })
 
 // get user by name
+router.get('/search', async (req, res) => {
+    const {username} = req.body
+    const user = await User.findOne({where: {username:username}})
+    if (!user){
+        res.status(400).send({err: "Could not find user"})
+    }
+    else res.send({id:user.id})
+})
 
 // creates a user
 router.post('/create', async (req, res) => {
@@ -37,7 +45,7 @@ router.post('/create', async (req, res) => {
     }
     else{
         await Folder.create({name: "inbox", owner: user.id})
-        res.send({msg: "successfully created"})
+        res.send(user)
     }
 })
 

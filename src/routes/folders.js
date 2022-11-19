@@ -55,8 +55,8 @@ router.get('/user/inbox/:id', async (req, res) => {
 router.post('/create', async (req, res) => {
     const {uid, name} = req.body
     try {
-        await Folder.create({name: name, owner: uid})
-        res.status(201).send({msg: "Created Folder"})
+        const folder = await Folder.create({name: name, owner: uid})
+        res.status(201).send(folder)
     } catch (e) {
         res.status(400).send({err:"Could not create folder"})
     }

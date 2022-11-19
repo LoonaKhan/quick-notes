@@ -6,6 +6,7 @@
 - - normally server_url = http://localhost:4000
 - All info needed on the html form are listed under each method
 - All fields are mandatory unless otherwise stated
+- All post methods return the created objects, so you should always have the id's to anything
 
 
 ## User API Requests:
@@ -24,6 +25,19 @@
   "password": "123", // any text
   "dark_mode": true, // boolean
   "avatar": 1, // int. corresponds to an avatar
+}
+```
+
+RETURNS:
+```json lines
+{
+	"id": 1,
+	"username": "loona",
+	"password": "123",
+	"dark_mode": true,
+	"avatar": 1,
+	"updatedAt": "2022-11-19T16:57:40.133Z",
+	"createdAt": "2022-11-19T16:57:40.133Z"
 }
 ```
 
@@ -53,6 +67,29 @@ RETURNS:
   "password": "123",
   "createdAt": "2022-11-18T00:12:19.823Z",
   "updatedAt": "2022-11-18T00:12:19.823Z"
+}
+```
+
+### Get a user by username
+- going to be used when you want to retrieve a user other than the current client
+- for example: sending a message to another user
+- fir security reasons, only the id of that user is given
+
+``ACTION = [server_url]+/api/users/search``
+
+``METHOD=GET``
+
+FIELDS:
+```json lines
+{
+  "username": "loona"
+}
+```
+
+RETURNS:
+```json lines
+{
+	"id": 1
 }
 ```
 
@@ -209,6 +246,17 @@ FIELDS:
 }
 ```
 
+RETURNS:
+```json lines
+{
+	"id": 2,
+	"name": "school",
+	"owner": 1,
+	"updatedAt": "2022-11-19T16:59:40.597Z",
+	"createdAt": "2022-11-19T16:59:40.597Z"
+}
+```
+
 ### Edit a folder's name
 - requires folder id(in the url) and the name of the folder in the body
 
@@ -251,6 +299,19 @@ FIELDS:
 }
 ```
 
+RETURNS:
+```json lines
+{
+	"id": 1,
+	"author": 1,
+	"folder": 1,
+	"content": "this is a new note",
+	"title": "new note",
+	"updatedAt": "2022-11-19T17:00:11.616Z",
+	"createdAt": "2022-11-19T17:00:11.616Z"
+}
+```
+
 ### Send a note to another user
 - this basically sends the same note, 
 - but the only thing that changes, is the folder which is set to the recipient's inbox
@@ -265,6 +326,19 @@ FIELDS:
 ```json lines
 {
   "inbox": 2 // *technically*, you can use any folder, but we intend it to only send to inboxes
+}
+```
+
+RETURNS:
+```json lines
+{
+	"id": 2,
+	"author": 1,
+	"folder": 2, // the inbox
+	"content": "this is aNOTHER NOTE",
+	"title": "ANOTHER note",
+	"updatedAt": "2022-11-19T17:01:09.286Z",
+	"createdAt": "2022-11-19T17:01:09.286Z"
 }
 ```
 

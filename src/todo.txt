@@ -3,5 +3,3 @@ sessions or cookies
 
 
 routes for webpages that just serve html
-
-all post methods return objects created
