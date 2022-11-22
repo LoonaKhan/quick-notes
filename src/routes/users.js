@@ -5,6 +5,8 @@
 const { Router } = require('express')
 const User = require('../database/User')
 const Folder = require('../database/Folder')
+const {v4: uuidv4} = require('uuid')
+const {sessions, Session} = require('../models/sessions')
 
 const router = Router()
 
@@ -13,13 +15,51 @@ const router = Router()
 // API ROUTES
 
 // gets a user by login credentials
-router.get('/', async (req, res) => {
+// initially tries the cookies, but if they are none, use the body
+router.get('/login', async (req, res) => {
     const {username, password} = req.body
+
     const user = await User.findOne({where: {username:username, password:password}})
     if (!user){
         res.status(400).send({err: "Could not find user"})
+        return
     }
-    else res.send(user)
+    else {
+        const sessToken = uuidv4() // creates the user token
+
+        // sets expiry date
+        const now = new Date()
+        const expiresAt = new Date(+now+3600* 1000)
+
+        //creates a new user session
+        const sess = new Session(username, expiresAt)
+
+        // adds the session to sessions
+        sessions[sessToken] = sess
+
+        // sets the cookie
+        console.log(sessToken)
+        res.cookie("session_token", sessToken, {expires: expiresAt}).send(user)
+    }
+})
+
+router.get('/logout', async (req, res) => {
+    if (!req.cookies) {
+        res.status(400).end()
+        return
+    }
+
+    const sessToken = req.cookies['session_token']
+    if (!sessToken) {
+        res.status(400).end()
+        return
+    }
+
+    delete sessions[sessToken]
+
+    res.cookie('session_token', "", {expires: new Date()})
+        .send("Logged out")
+        .end()
 })
 
 // get user by name
@@ -64,7 +104,11 @@ router.put('/edit/password/:id', async (req, res) => {
     else {
         user.password = req.body.password
         await user.save()
-        res.send({msg: "updated"})
+
+        res
+            .clearCookie('password')
+            .cookie('password', req.body.password)
+            .send({msg: "updated"})
     }
 })
 

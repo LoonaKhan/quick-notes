@@ -4,12 +4,15 @@
 */
 
 const express = require('express')
+const cookieParser = require('cookie-parser')
 const {PORT} = require('./config.json')
 const path = require('path')
 const sequelize = require('./database/db')
 
+
 const app = express() // init express
 app.use(express.json()) // allows us to parse json requests
+app.use(cookieParser())
 sequelize.sync().then(() => console.log('db on')) // init sqlite and syncs all tables
 
 
@@ -29,11 +32,8 @@ app.use('/api/folders', foldersRoutes)
 // only pages that are meant to be directly reached.
 // redirects are excluded
 
-app.get('/', async (req, res) =>{ // home
-  // loads the login page
-  // login page will redirect the user
-  res.sendFile(path.join(__dirname, './webpages', 'login.html'))
-})
+const webPages = require('./routes/webpages')
+app.use('/', webPages)
 
 
 // THE SERVER
