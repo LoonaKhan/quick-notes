@@ -1,4 +1,4 @@
-const {Sequelize} = require('sequelize')
+const { Sequelize } = require('sequelize')
 const { dev_db, dev_host, db, db_host } = require('../config.json')
 
 const sequelize = new Sequelize(
@@ -6,8 +6,8 @@ const sequelize = new Sequelize(
     'user', 'passwd', // username and passwd arent too important for sqlite
     { // options object
         dialect: "sqlite",
-        host: dev_host
-})
+        host: db_host
+    })
 
 module.exports = sequelize
 

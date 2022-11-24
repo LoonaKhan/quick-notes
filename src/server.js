@@ -5,7 +5,7 @@
 
 const express = require('express')
 const cookieParser = require('cookie-parser')
-const {PORT} = require('./config.json')
+const { PORT } = require('./config.json')
 const path = require('path')
 const sequelize = require('./database/db')
 
@@ -35,6 +35,8 @@ app.use('/api/folders', foldersRoutes)
 const webPages = require('./routes/webpages')
 app.use('/', webPages)
 
+// Public URLs
+app.use(express.static(__dirname + '/public'));
 
 // THE SERVER
 
