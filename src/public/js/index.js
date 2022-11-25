@@ -48,16 +48,17 @@ function onLogin() {
     let username = document.getElementById("Username").value;
     let password = document.getElementById("Password").value;
 
-    alert(username);
-    alert(password);
-
     let url = "http://localhost:4000/api/users/login";
     let post = JSON.stringify({
         username: username, password: password
     });
 
-    ajaxCall(url, "POST", alert, post);
+    ajaxCall(url, "POST", redirect, post);
 
+}
+
+function redirect(url) {
+    window.location.replace(url)
 }
 
 function processFolderNotes(response) {

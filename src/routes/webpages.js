@@ -37,9 +37,9 @@ router.get('/signup', async (req, res) => {
     res.sendFile(path.join(__dirname, webpagesPath, 'signup.html'))
 })
 
-router.get('/test', async (req, res) => {
+router.get('/index', async (req, res) => {
     if (sessHandler(req)) {
-        res.sendFile(path.join(__dirname, webpagesPath, 'test.html'))
+        res.sendFile(path.join(__dirname, webpagesPath, 'index.html'))
     } else { // always just redirect to the login page
         res.sendFile(path.join(__dirname, webpagesPath, 'login.html'))
     }
