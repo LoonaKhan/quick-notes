@@ -1,5 +1,5 @@
-const {Router } = require('express')
-const {Session, sessions} = require('../models/sessions')
+const { Router } = require('express')
+const { Session, sessions } = require('../models/sessions')
 const path = require("path");
 
 router = Router()
@@ -19,7 +19,7 @@ const sessHandler = (req) => { // checks if a user is logged in. returns a bool
         return false
     }
 
-    if (userSess.isExpired()){ // checks if its expired
+    if (userSess.isExpired()) { // checks if its expired
         delete sessions[sessToken]
         return false
     }
@@ -33,8 +33,12 @@ router.get('/', async (req, res) => {
     res.sendFile(path.join(__dirname, webpagesPath, 'login.html'))
 })
 
+router.get('/signup', async (req, res) => {
+    res.sendFile(path.join(__dirname, webpagesPath, 'signup.html'))
+})
+
 router.get('/test', async (req, res) => {
-    if (sessHandler(req)){
+    if (sessHandler(req)) {
         res.sendFile(path.join(__dirname, webpagesPath, 'test.html'))
     } else { // always just redirect to the login page
         res.sendFile(path.join(__dirname, webpagesPath, 'login.html'))
