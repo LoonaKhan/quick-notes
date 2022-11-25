@@ -1,7 +1,8 @@
 window.onload = function () {
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const userId = urlParams.get('id');
+    const userId = localStorage.getItem('userId');
+    document.getElementById("userName").innerHTML = localStorage.getItem('userName');
+    document.getElementById("avatar").src = "img/" + localStorage.getItem('avatar');
+
     let url = "http://localhost:4000/api/folders/user/" + userId;
     ajaxCall(url, "GET", processFolderNotes);
 }
@@ -27,11 +28,26 @@ function ajaxCall(url, action, callback, post = null) {
 }
 
 function onEditNotes(folderObj) {
-    let html = "";
+    let html = "<div class='pt-4 pl-2 pr-2'>"
+    html += "<div class='p-2 pl-2 pr-2 m-2' style='background: #C4C4C4;'>";
+    html += "<div class='form-label' for='folderName'><i class='fa fa-sticky-note-o pr-2'></i>Folder Name: ";
+    html += "<input type='text' id='folderName' class='form-control' value='" + folderObj.name + "'/>";
+    html += "</div>";
+    html += "</div>";
 
-    for (let i = 0; i < folderObj.Notes.length; i++) {
-        html += "<textarea>" + folderObj.Notes[i].Content + "</textarea>";
+    // Print Notes
+    html += "<div class='p-2'>";
+    for (let i = 0; i < folderObj.NOTEs.length; i++) {
+        html += "<div class='w-100 pt-2 pl-2 pr-2 mb-3' style='background: rgba(244,236,194,0.5);'>";
+        html += "<label class='form-label pl-2' for='noteTitle'><i class='fa fa-sticky-note-o pr-2'></i>Note Title</label>";
+        html += "<input type='text' id='noteTitle' class='form-control' value='" + folderObj.NOTEs[i].title + "'/>";
+        html += "<label class='form-label pl-2 pt-2' for='noteTitle'>Note Content</label>";
+        html += "<textarea id='noteContent' class='w-100 pl-2 pr-2'>" + folderObj.NOTEs[i].content + "</textarea>";
+        html += "</div>";
     }
+    html += "</div>";
+
+    html += "</div>"; // for the main div
     placeContentInMainBody(html);
 }
 
@@ -91,25 +107,24 @@ function processFolderNotes(response) {
         html += "</div>";
 
         // Printing Notes in folders
+        let isRowNoteClosed;
+        html += "<div class='container-fluid'>";
+        for (let j = 0; j < folderObj.NOTEs.length; j++) {
+            if ((j % 4) == 0) {
+                html += "<div class='row mt-3 mb-3'>";
+                isRowNoteClosed = false;
+            }
 
-        //let isRowNoteClosed;
-        //html += "<div class='container-fluid'>";
-        // for (let j = 0; j < folderObj.Notes.length; j++) {
-        //     if ((j % 4) == 0) {
-        //         html += "<div class='row mt-3 mb-3'>";
-        //         isRowNoteClosed = false;
-        //     }
+            html += "<div class='col-3'><div style='background: #D9D9D9; height: 50px;'></div></div>";
 
-        //     html += "<div class='col-3'><div style='background: #D9D9D9; height: 50px;'></div></div>";
-
-        //     if (((j + 1) % 4) == 0) {
-        //         html += "</div>"; //This is the notes row div
-        //         isRowNoteClosed = true;
-        //     }
-        //     if (j == 7) break;
-        // }
-        //if (!isRowNoteClosed) html += "</div>"; //This is the final notes row div
-        //html += "</div>"; //This is the note container div
+            if (((j + 1) % 4) == 0) {
+                html += "</div>"; //This is the notes row div
+                isRowNoteClosed = true;
+            }
+            if (j == 7) break;
+        }
+        if (isRowNoteClosed == false) html += "</div>"; //This is the final notes row div
+        html += "</div>"; //This is the note container div
 
         //Closes the folder div
         html += "</div></div>";

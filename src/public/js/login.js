@@ -42,6 +42,12 @@ function onLogin() {
 
 function redirectToMainPage(response) {
     let user = JSON.parse(response);
-    let url = "/index?id=" + user.id;
-    window.location.replace(url);
+
+    // save user information on the browser
+    localStorage.setItem('userId', user.id);
+    localStorage.setItem('userName', user.username);
+    localStorage.setItem('darkMode', user.dark_mode);
+    localStorage.setItem('avatar', user.avatar);
+
+    window.location.replace("/index");
 }
