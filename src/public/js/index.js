@@ -1,8 +1,6 @@
-const { post } = require("../../routes/users");
-
-window.onload = function () {
-    ajaxCall('noteFolder.json', "GET", processFolderNotes);
-}
+// window.onload = function () {
+//     ajaxCall('noteFolder.json', "GET", processFolderNotes);
+// }
 
 function placeContentInMainBody(html) {
     document.getElementById("main-body").innerHTML = html;
@@ -11,7 +9,7 @@ function placeContentInMainBody(html) {
 function ajaxCall(url, action, callback, post = null) {
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open(action, url, true);
-    xhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
+    xmlhttp.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
     xmlhttp.send(post);
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState === 4) {
@@ -34,13 +32,32 @@ function onEditNotes(folderObj) {
 }
 
 function onCreateUser() {
+    let username = document.getElementById("Username").value;
+    let password = document.getElementById("Password").value;
+
     let url = "http://localhost:4000/api/users/create";
     let post = JSON.stringify({
-        username: "Fosrock", password: "Faisal123", dark_mode: true,
+        username: username, password: password, dark_mode: true,
         avatar: 1,
     });
 
     ajaxCall(url, "POST", alert, post);
+}
+
+function onLogin() {
+    let username = document.getElementById("Username").value;
+    let password = document.getElementById("Password").value;
+
+    alert(username);
+    alert(password);
+
+    let url = "http://localhost:4000/api/users/login";
+    let post = JSON.stringify({
+        username: username, password: password
+    });
+
+    ajaxCall(url, "POST", alert, post);
+
 }
 
 function processFolderNotes(response) {

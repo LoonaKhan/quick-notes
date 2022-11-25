@@ -5,8 +5,8 @@
 const { Router } = require('express')
 const User = require('../database/User')
 const Folder = require('../database/Folder')
-const {v4: uuidv4} = require('uuid')
-const {sessions, Session} = require('../models/sessions')
+const { v4: uuidv4 } = require('uuid')
+const { sessions, Session } = require('../models/sessions')
 
 const router = Router()
 
@@ -16,12 +16,12 @@ const router = Router()
 
 // gets a user by login credentials
 // initially tries the cookies, but if they are none, use the body
-router.get('/login', async (req, res) => {
-    const {username, password} = req.body
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body
 
-    const user = await User.findOne({where: {username:username, password:password}})
-    if (!user){
-        res.status(400).send({err: "Could not find user"})
+    const user = await User.findOne({ where: { username: username, password: password } })
+    if (!user) {
+        res.status(400).send({ err: "Could not find user" })
         return
     }
     else {
@@ -29,7 +29,7 @@ router.get('/login', async (req, res) => {
 
         // sets expiry date
         const now = new Date()
-        const expiresAt = new Date(+now+3600* 1000)
+        const expiresAt = new Date(+now + 3600 * 1000)
 
         //creates a new user session
         const sess = new Session(username, expiresAt)
@@ -39,7 +39,7 @@ router.get('/login', async (req, res) => {
 
         // sets the cookie
         console.log(sessToken)
-        res.cookie("session_token", sessToken, {expires: expiresAt}).send(user)
+        res.cookie("session_token", sessToken, { expires: expiresAt }).send("/test")
     }
 })
 
@@ -57,19 +57,19 @@ router.get('/logout', async (req, res) => {
 
     delete sessions[sessToken]
 
-    res.cookie('session_token', "", {expires: new Date()})
+    res.cookie('session_token', "", { expires: new Date() })
         .send("Logged out")
         .end()
 })
 
 // get user by name
 router.get('/search', async (req, res) => {
-    const {username} = req.body
-    const user = await User.findOne({where: {username:username}})
-    if (!user){
-        res.status(400).send({err: "Could not find user"})
+    const { username } = req.body
+    const user = await User.findOne({ where: { username: username } })
+    if (!user) {
+        res.status(400).send({ err: "Could not find user" })
     }
-    else res.send({id:user.id})
+    else res.send({ id: user.id })
 })
 
 // creates a user
@@ -80,26 +80,26 @@ router.post('/create', async (req, res) => {
      */
 
     const user = await User.create(req.body)
-    if(!user) {
-        res.status(400).send({err:"Couldnt find user"})
+    if (!user) {
+        res.status(400).send({ err: "Couldnt find user" })
     }
-    else{
-        await Folder.create({name: "inbox", owner: user.id})
+    else {
+        await Folder.create({ name: "inbox", owner: user.id })
         res.send(user)
     }
 })
 
 // logs a user in
-router.put('/login/:id', async (req, res) => {})
+router.put('/login/:id', async (req, res) => { })
 
 // change a user password
 // requires a new password.
 router.put('/edit/password/:id', async (req, res) => {
     const id = req.params.id
 
-    const user = await User.findOne({where: {id: id}})
+    const user = await User.findOne({ where: { id: id } })
     if (!user) {
-        res.status(400).send({err:"Couldnt find user"})
+        res.status(400).send({ err: "Couldnt find user" })
     }
     else {
         user.password = req.body.password
@@ -108,7 +108,7 @@ router.put('/edit/password/:id', async (req, res) => {
         res
             .clearCookie('password')
             .cookie('password', req.body.password)
-            .send({msg: "updated"})
+            .send({ msg: "updated" })
     }
 })
 
@@ -116,24 +116,24 @@ router.put('/edit/password/:id', async (req, res) => {
 router.put('/edit/dark_mode/:id', async (req, res) => {
     const id = req.params.id
 
-    const user = await User.findOne({where: {id: id}})
+    const user = await User.findOne({ where: { id: id } })
     if (!user) {
-        res.status(400).send({err:"Couldnt find user"})
+        res.status(400).send({ err: "Couldnt find user" })
     }
     else {
         user.dark_mode = req.body.dark_mode
         await user.save()
-        res.send({msg: "updated"})
+        res.send({ msg: "updated" })
     }
 })
 
 // delete
 router.delete('/del/:id', async (req, res) => {
     const id = req.params.id
-    if (!(await User.destroy({where: {id: id}}))) {
-        res.status(400).send({err: "could not delete user"})
+    if (!(await User.destroy({ where: { id: id } }))) {
+        res.status(400).send({ err: "could not delete user" })
     }
-    else res.send({msg: "deletion successful"})
+    else res.send({ msg: "deletion successful" })
 })
 
 
