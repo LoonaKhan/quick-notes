@@ -43,6 +43,7 @@ router.post('/login', async (req, res) => {
     }
 })
 
+//logs user out
 router.get('/logout', async (req, res) => {
     if (!req.cookies) {
         res.status(400).end()

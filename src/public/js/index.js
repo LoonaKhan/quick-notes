@@ -19,10 +19,10 @@ function ajaxCall(url, action, callback, post = null) {
     xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState === 4) {
             if (xmlhttp.status === 200 || xmlhttp.status === 201) {
-                callback(xmlhttp.responseText);
+                if (callback) callback(xmlhttp.responseText);
             }
             else
-                callback("Error \n" + xmlhttp.responseText);
+                if (callback) callback("Error \n" + xmlhttp.responseText);
         }
     }
 }
@@ -49,39 +49,6 @@ function onEditNotes(folderObj) {
 
     html += "</div>"; // for the main div
     placeContentInMainBody(html);
-}
-
-function onCreateUser() {
-    let username = document.getElementById("Username").value;
-    let password = document.getElementById("Password").value;
-
-    let url = "http://localhost:4000/api/users/create";
-    let post = JSON.stringify({
-        username: username, password: password, dark_mode: true,
-        avatar: 1,
-    });
-
-    ajaxCall(url, "POST", alert, post);
-}
-
-function onLogin() {
-    let username = document.getElementById("Username").value;
-    let password = document.getElementById("Password").value;
-
-    let url = "http://localhost:4000/api/users/login";
-    let post = JSON.stringify({
-        username: username, password: password
-    });
-
-    ajaxCall(url, "POST", redirectToMainPage, post);
-
-}
-
-function redirectToMainPage(user) {
-    window.location.replace("/index");
-
-    let url = "http://localhost:4000/api/folders/" + user.id;
-    ajaxCall(url, "GET", processFolderNotes, post);
 }
 
 function processFolderNotes(response) {
@@ -134,4 +101,97 @@ function processFolderNotes(response) {
     }
     html += "</div>";
     placeContentInMainBody(html);
+}
+
+function onLogout() {
+    let url = "http://localhost:4000/api/folders/logout";
+    ajaxCall(url, "GET", redirectToLoginPage);
+}
+
+function redirectToLoginPage() {
+    window.location.replace("/");
+}
+
+function onDeleteUser() {
+    const userId = localStorage.getItem('userId');
+    let url = "http://localhost:4000/api/users/del/" + userId;
+    ajaxCall(url, "DELETE", redirectToLoginPage);
+}
+
+function profile() {
+    let html = "<div class='row justify-content-center align-items-center h-100'>";
+    html += "<div class='col-12 col-lg-9 col-xl-7'>";
+    html += "<div class='card bg-dark text-white' style='border-radius: 15px;'>";
+    html += "<div class='card-body p-4 p-md-5'>";
+    html += "<h3 class='mb-4 pb-2 pb-md-0 mb-md-5'>Profile</h3>";
+    html += "<div class='row'>";
+    html += "<div class='col-md-7 mb-4'>";
+    html += "<h3>Change Password</h3>";
+    html += "<div class='form-outline'>";
+    html += "<input type='Password' id='Password' class='form-control form-control-lg' name='password'>";
+    html += "<label class='form-label' for='Password'>Password</label>";
+    html += "</div>";
+    html += "</div>";
+    html += "<div class='col-12 mb-4'>";
+    html += "<div class='row'>";
+    html += "<div class='col-6'>";
+    html += "<h3>Change Theme</h3>";
+    html += "</div>";
+    html += "<div class='col-3 d-flex align-items-center justify-content-center'>";
+    html += "<div class='form-check'>";
+    html += "<input class='form-check-input' type='radio' name='themType' value='0'>";
+    html += "<label class='form-check-label' for='flexRadioDefault1'>Lightmode</label>";
+    html += "</div>";
+    html += "</div>";
+    html += "<div class='col-3 d-flex align-items-center justify-content-center'>";
+    html += "<div class='form-check'>";
+    html += "<input class='form-check-input' type='radio' name='themType' value='1' checked=''>";
+    html += "<label class='form-check-label' for='flexRadioDefault2'>Darkmode</label>";
+    html += "</div>";
+    html += "</div>";
+    html += "</div>";
+    html += "</div>";
+    html += "</div>";
+    html += "</div>";
+    html += "<div class='mt-4 pt-2 text-center'>";
+    html += "<button class='btn btn-primary btn-lg mr-3' onclick='onProfileChange()'>Update Profile</button>";
+    html += "<button class='btn btn-primary btn-lg' onclick='onDeleteUser()'>Delete User</button>";
+    html += "</div>";
+    html += "<br>";
+    html += "<br>";
+    html += "</div>";
+    html += "</div>";
+    html += "</div>";
+
+    placeContentInMainBody(html);
+
+}
+
+function onProfileChange() {
+
+    const userId = localStorage.getItem('userId');
+    let themTypes = document.getElementsByName("themType");
+    let password = document.getElementById("Password").value;
+    let urlEdit = "http://localhost:4000/api/users/edit/password/" + userId;
+    let urlEditTheme = "http://localhost:4000/api/users/edit/dark_mode/" + userId;
+
+    //Extracting theme type from radiobox
+    let darkMode = false;
+    for (let i = 0; i < themTypes.length; i++) {
+        const themType = themTypes[i];
+        if (themType.checked)
+            darkMode = themType.value;
+
+    }
+
+    let post = JSON.stringify({
+        dark_mode: darkMode
+    });
+    ajaxCall(urlEditTheme, "PUT", null, post);
+
+    post = JSON.stringify({
+        password: password
+    });
+    ajaxCall(urlEdit, "PUT", redirectToLoginPage, post);
+
 }

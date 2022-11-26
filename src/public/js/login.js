@@ -14,14 +14,36 @@ function ajaxCall(url, action, callback, post = null) {
     }
 }
 
+//create user prefernces 
 function onCreateUser() {
     let username = document.getElementById("Username").value;
     let password = document.getElementById("Password").value;
+    let themTypes = document.getElementsByName("themType");
+    let images = document.getElementsByName("imgbackground");
+
+
+    //Extracting theme type from radiobox
+    let darkMode = false;
+    for (let i = 0; i < themTypes.length; i++) {
+        const themType = themTypes[i];
+        if (themType.checked)
+            darkMode = themType.value;
+
+    }
+
+    //Extracting avatar from images
+    let avatar = "user_icon_boy.png";
+    for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        if (image.checked)
+            avatar = image.value;
+
+    }
 
     let url = "http://localhost:4000/api/users/create";
     let post = JSON.stringify({
-        username: username, password: password, dark_mode: true,
-        avatar: 1,
+        username: username, password: password, dark_mode: darkMode,
+        avatar: avatar,
     });
 
     ajaxCall(url, "POST", alert, post);
