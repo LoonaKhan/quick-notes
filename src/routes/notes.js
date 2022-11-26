@@ -32,7 +32,6 @@ router.post('/create', async (req, res) => {
     /*
     Requires a uid, folder name, content and title fo the note
      */
-    // todo: the folder/user may not exist. add error
 
     const note = await Note.create(req.body)
     res.status(201).send(note)
