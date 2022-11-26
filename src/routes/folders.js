@@ -58,7 +58,7 @@ router.post('/create', async (req, res) => {
     const { uid, name } = req.body
     try {
         const folder = await Folder.create({ name: name, owner: uid })
-        res.status(201).send(folder)
+        res.status(201).send("Folder " + name + " is created")
     } catch (e) {
         res.status(400).send({ err: "Could not create folder" })
     }

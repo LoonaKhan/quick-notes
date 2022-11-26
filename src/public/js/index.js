@@ -26,29 +26,147 @@ function ajaxCall(url, action, callback, post = null) {
         }
     }
 }
+function alertAndReload(response) {
+    alert(response);
+    location.reload()
+}
+
+function CreateGUID() {
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
+}
+
+// -------------------------
+// Folder Functions
+// -------------------------
+function onCreateFolder() {
+    const userId = localStorage.getItem('userId');
+    let folderName = prompt("Please enter folder name:", "");
+    if (folderName) {
+        let url = "http://localhost:4000/api/folders/create";
+        let post = JSON.stringify({
+            uid: userId,
+            name: folderName
+        });
+        ajaxCall(url, "POST", alertAndReload, post);
+    }
+}
+
+function onRenameFolder() {
+    let folderName = document.getElementById("folderName").value;
+    let folderId = document.getElementById("folderId").value;
+    let url = "http://localhost:4000/api/folders/edit/" + folderId;
+    let post = JSON.stringify({ name: folderName });
+    ajaxCall(url, "PUT", alert, post);
+}
+
+// -------------------------
+// Note Functions
+// -------------------------
+
+function onAddNote() {
+    let notesContainer = document.getElementById("notesContainer");
+    let notesHtml = notesContainer.innerHTML;
+    notesHtml = buildNoteHtml("", "") + " " + notesHtml;
+    notesContainer.innerHTML = notesHtml;
+}
 
 function onEditNotes(folderObj) {
     let html = "<div class='pt-4 pl-2 pr-2'>"
-    html += "<div class='p-2 pl-2 pr-2 m-2' style='background: #C4C4C4;'>";
-    html += "<div class='form-label' for='folderName'><i class='fa fa-sticky-note-o pr-2'></i>Folder Name: ";
+    html += "<div class='rounded-top p-2 pl-2 pr-2 m-2' style='background: #C4C4C4;'>";
+    html += "<div class='form-label' for='folderName'><i class='fa fa-folder-open-o pr-2' aria-hidden='true'></i>Folder Name: ";
     html += "<input type='text' id='folderName' class='form-control' value='" + folderObj.name + "'/>";
+    html += "<input type='hidden' id='folderId' value='" + folderObj.id + "'/>";
+    html += "</div>";
+
+    html += "<div class='p-1'> ...";
+    html += "<div class='float-right'>";
+    html += "<button type='button' class='btn p-0 mr-3' onclick='onRenameFolder()'><i class='fa fa-pencil-square-o pr-1'></i>Rename Folder</button>";
+    html += "<button type='button' class='btn p-0 m-1' onclick='onAddNote()'><i class='fa fa-plus-square pr-1'></i>Add Note</button>";
     html += "</div>";
     html += "</div>";
 
+    html += "</div>";
+
     // Print Notes
-    html += "<div class='p-2'>";
-    for (let i = 0; i < folderObj.NOTEs.length; i++) {
-        html += "<div class='w-100 pt-2 pl-2 pr-2 mb-3' style='background: rgba(244,236,194,0.5);'>";
-        html += "<label class='form-label pl-2' for='noteTitle'><i class='fa fa-sticky-note-o pr-2'></i>Note Title</label>";
-        html += "<input type='text' id='noteTitle' class='form-control' value='" + folderObj.NOTEs[i].title + "'/>";
-        html += "<label class='form-label pl-2 pt-2' for='noteTitle'>Note Content</label>";
-        html += "<textarea id='noteContent' class='w-100 pl-2 pr-2'>" + folderObj.NOTEs[i].content + "</textarea>";
-        html += "</div>";
-    }
+    html += "<div id='notesContainer' class='p-2'>";
+    for (let i = 0; i < folderObj.NOTEs.length; i++)
+        html += buildNoteHtml(folderObj.NOTEs[i].title, folderObj.NOTEs[i].content, folderObj.NOTEs[i].id);
+
     html += "</div>";
 
     html += "</div>"; // for the main div
     placeContentInMainBody(html);
+}
+
+function onSaveNote(noteId) {
+    const noteDiv = document.getElementById(noteId);
+    const userId = localStorage.getItem('userId');
+    const folderId = document.getElementById("folderId").value;
+    const title = noteDiv.getElementsByTagName("input")[0].value;
+    const content = noteDiv.getElementsByTagName("textarea")[0].value;
+
+    if (isNaN(noteId)) {
+        // Create a new note in database
+        let url = "http://localhost:4000/api/notes/create";
+        let post = JSON.stringify({
+            content: content,
+            title: title,
+            author: userId,
+            folder: folderId
+        });
+        ajaxCall(url, "POST", alert, post);
+    }
+    else {
+        // Update the note in database
+        let url = "http://localhost:4000/api/notes/edit/" + noteId;
+        let post = JSON.stringify({
+            newContent: content,
+            newTitle: title
+        });
+        ajaxCall(url, "PUT", alert, post);
+    }
+}
+
+function onDeleteNote(noteId) {
+    let notesHtml = "";
+    let notesContainer = document.getElementById("notesContainer");
+    let noteDivs = document.getElementsByName("noteDiv");
+
+    for (let i = 0; i < noteDivs.length; i++) {
+        const noteDiv = noteDivs[i];
+        if (isNaN(noteDiv.id) && noteDiv.id == noteId)
+            continue; // Delete from interface only
+        else if (!isNaN(noteDiv.id) && noteDiv.id == noteId) {
+            // Delete from database and interface
+            let url = "http://localhost:4000/api/notes/del/" + noteId;
+            ajaxCall(url, "DELETE", alert);
+        }
+        else
+            // Don't delete
+            notesHtml += " " + noteDiv.outerHTML;
+    }
+    notesContainer.innerHTML = notesHtml;
+}
+
+function buildNoteHtml(title, content, noteId) {
+    let html = "";
+    if (!noteId) noteId = CreateGUID();
+
+    html += "<div id='" + noteId + "' name='noteDiv' class='w-100 pt-2 pl-2 pr-2 mb-3' style='background: lightyellow;'>";
+    html += "<label class='form-label pl-2' for='noteTitle'><i class='fa fa-sticky-note-o pr-2'></i>Note Title</label>";
+
+    html += "<div class='float-right'>";
+    html += "<button type='button' class='btn text-secondary p-0 pr-1' data-toggle='tooltip' title='Save' onClick='onSaveNote(\"" + noteId + "\")'><i class='fa fa-floppy-o'></i></button>";
+    html += "<button type='button' class='btn text-secondary p-0 pr-1' data-toggle='tooltip' title='Delete' onClick='onDeleteNote(\"" + noteId + "\")'><i class='fa fa-trash-o'></i></button>";
+    html += "</div>";
+
+    html += "<input type='text' class='form-control' value='" + title + "'/>";
+    html += "<label class='form-label pl-2 pt-2' for='noteTitle'>Note Content</label>";
+    html += "<textarea class='w-100 pl-2 pr-2' style='background: rgba(244,236,194,05);'>" + content + "</textarea>";
+    html += "</div>";
+    return html;
 }
 
 function processFolderNotes(response) {
@@ -68,8 +186,8 @@ function processFolderNotes(response) {
         html += "<div class='col-4'><div class='ml-1 p-2 roundeda' style='background: #808080; height: 220px; '>";
         html += "<div class='rounded-pill p-2 m-1' style='background: #C4C4C4;'>" + folderObj.name;
         html += "<div class='float-right'>";
-        html += "<button type='button' class='btn p-0 pr-1'><i class='fa fa-star'></i></button>";
-        html += "<button type='button' class='btn p-0 pr-1' onClick='onEditNotes(" + folderJson + ")'><i class='fa fa-pencil-square-o'></i></button>";
+        html += "<button type='button' class='btn p-0 pr-1' data-toggle='tooltip' title='Add to Favorite'><i class='fa fa-star'></i></button>";
+        html += "<button type='button' class='btn p-0 pr-1' data-toggle='tooltip' title='Edit' onClick='onEditNotes(" + folderJson + ")'><i class='fa fa-pencil-square-o'></i></button>";
         html += "</div>";
         html += "</div>";
 
