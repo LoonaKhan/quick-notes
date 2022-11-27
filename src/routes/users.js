@@ -80,13 +80,16 @@ router.post('/create', async (req, res) => {
         creates an inbox and dark_mode setting on its own
      */
 
-    const user = await User.create(req.body)
-    if (!user) {
-        res.status(400).send({ err: "Couldnt find user" })
-    }
-    else {
-        await Folder.create({ name: "inbox", owner: user.id })
-        res.send(user)
+    try {
+        const user = await User.create(req.body)
+        if (!user) {
+            res.status(400).send({err: "Couldnt find user"})
+        } else {
+            await Folder.create({name: "inbox", owner: user.id})
+            res.send(user)
+        }
+    } catch (e) {
+        res.status(400).send({err:"Could not create user"})
     }
 })
 

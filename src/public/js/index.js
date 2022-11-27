@@ -343,4 +343,3 @@ function onProfileChange() {
     ajaxCall(urlEdit, "PUT", null, post);
 
 }
-
