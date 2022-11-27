@@ -50,6 +50,7 @@ function onCreateUser() {
 }
 
 function onLogin() {
+
     let username = document.getElementById("Username").value;
     let password = document.getElementById("Password").value;
 

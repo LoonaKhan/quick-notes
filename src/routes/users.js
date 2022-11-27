@@ -39,11 +39,10 @@ router.post('/login', async (req, res) => {
 
         // sets the cookie
         console.log(sessToken)
-        res.cookie("session_token", sessToken, { expires: expiresAt }).send("user")
+        res.cookie("session_token", sessToken, { expires: expiresAt }).send(user)
     }
 })
 
-//logs user out
 router.get('/logout', async (req, res) => {
     if (!req.cookies) {
         res.status(400).end()
@@ -80,16 +79,13 @@ router.post('/create', async (req, res) => {
         creates an inbox and dark_mode setting on its own
      */
 
-    try {
-        const user = await User.create(req.body)
-        if (!user) {
-            res.status(400).send({err: "Couldnt find user"})
-        } else {
-            await Folder.create({name: "inbox", owner: user.id})
-            res.send(user)
-        }
-    } catch (e) {
-        res.status(400).send({err:"Could not create user"})
+    const user = await User.create(req.body)
+    if (!user) {
+        res.status(400).send({ err: "Couldnt find user" })
+    }
+    else {
+        await Folder.create({ name: "inbox", owner: user.id })
+        res.send(user)
     }
 })
 
