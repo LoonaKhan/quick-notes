@@ -59,7 +59,6 @@ function onLogin() {
     });
 
     ajaxCall(url, "POST", redirectToMainPage, post);
-
 }
 
 function redirectToMainPage(response) {

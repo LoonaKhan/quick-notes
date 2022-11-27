@@ -9,21 +9,20 @@ const Note = require('../database/Note')
 const router = Router()
 
 
-
 // API ROUTES
 
 // gets a note by id
 router.get('/:id', async (req, res) => {
     const id = req.params.id
 
-    const note = await Note.findOne({where: {id:id}})
+    const note = await Note.findOne({ where: { id: id } })
     res.send(note)
 })
 
 // get all notes in a folder
 router.get('/folder/:id/', async (req, res) => {
     const id = req.params.id
-    const notes = await Note.findAll({where: {folder:id}})
+    const notes = await Note.findAll({ where: { folder: id } })
     res.send(notes)
 })
 
@@ -35,23 +34,23 @@ router.post('/create', async (req, res) => {
     // todo: the folder/user may not exist. add error
 
     const note = await Note.create(req.body)
-    res.status(201).send(note)
+    res.status(201).send("updated successfully")
 })
 
 // edits a note
 router.put('/edit/:id', async (req, res) => {
     const id = req.params.id
-    const {newTitle, newContent} = req.body
+    const { newTitle, newContent } = req.body
 
     try {
-        const note = await Note.findOne({where: {id:id}})
+        const note = await Note.findOne({ where: { id: id } })
 
         note.title = newTitle
         note.content = newContent
 
         await note.save()
 
-        res.status(201).send({msg: "updated successfully"})
+        res.status(201).send({ msg: "updated successfully" })
     } catch (e) {
         res.status(401).send(e)
     }
@@ -62,21 +61,21 @@ router.delete('/del/:id', async (req, res) => {
     const id = req.params.id
 
     try {
-        await Note.destroy({where:{id:id}})
-        res.status(201).send({msg:"Deleted Note"})
+        await Note.destroy({ where: { id: id } })
+        res.status(201).send({ msg: "Deleted Note" })
     } catch (e) {
-        res.status(400).send({msg: "note not found", err:e})
+        res.status(400).send({ msg: "note not found", err: e })
     }
 })
 
 // send a copy of a note to an inbox
 // requires a note id and the recipient's id
-router.post('/send/:note_id', async (req, res) =>{
+router.post('/send/:note_id', async (req, res) => {
     const note_id = req.params.note_id
-    const {inbox} = req.body
+    const { inbox } = req.body
 
     try {
-        const note = await Note.findOne({where: {id: note_id}})
+        const note = await Note.findOne({ where: { id: note_id } })
         const sent_note = await Note.create({
             author: note.author,
             folder: inbox,

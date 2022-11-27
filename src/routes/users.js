@@ -39,7 +39,7 @@ router.post('/login', async (req, res) => {
 
         // sets the cookie
         console.log(sessToken)
-        res.cookie("session_token", sessToken, { expires: expiresAt }).send(user)
+        res.cookie("session_token", sessToken, { expires: expiresAt }).send("user")
     }
 })
 

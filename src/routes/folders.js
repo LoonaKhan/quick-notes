@@ -86,7 +86,7 @@ router.delete('/del/:id', async (req, res) => {
 
     try {
         await Folder.destroy({ where: { id: id } })
-        res.status(201).send({ msg: "Created folder" })
+        res.status(201).send("Folder deleted")
     } catch (e) {
         res.status(400).send({ msg: "could not delete folder", err: e })
     }

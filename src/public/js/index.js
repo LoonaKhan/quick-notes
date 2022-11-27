@@ -5,7 +5,23 @@ window.onload = function () {
 
     let url = "http://localhost:4000/api/folders/user/" + userId;
     ajaxCall(url, "GET", processFolderNotes);
+
+    // let currentTheme = localStorage.getItem('darkMode');
+    // toggleTheme(currentTheme);
+
 }
+
+// function toggleTheme(currentTheme) {
+//     debugger;
+//     var theme = document.getElementsByTagName('link')[0];
+//     theme.getAttribute('href') == 'css/Template-dark.css'
+
+//     if (currentTheme)
+//         theme.setAttribute('href', 'css/Template-dark.css');
+//     else
+//         theme.setAttribute('href', 'css/Template-light.css');
+
+// }
 
 function placeContentInMainBody(html) {
     document.getElementById("main-body").innerHTML = html;
@@ -28,6 +44,10 @@ function ajaxCall(url, action, callback, post = null) {
 }
 function alertAndReload(response) {
     alert(response);
+    location.reload()
+}
+
+function reload() {
     location.reload()
 }
 
@@ -61,6 +81,13 @@ function onRenameFolder() {
     ajaxCall(url, "PUT", alert, post);
 }
 
+function onDeleteFolder(folderId) {
+
+    let url = "http://localhost:4000/api/folders/del/" + folderId;
+    ajaxCall(url, "DELETE", reload);
+
+}
+
 // -------------------------
 // Note Functions
 // -------------------------
@@ -74,7 +101,7 @@ function onAddNote() {
 
 function onEditNotes(folderObj) {
     let html = "<div class='pt-4 pl-2 pr-2'>"
-    html += "<div class='rounded-top p-2 pl-2 pr-2 m-2' style='background: #C4C4C4;'>";
+    html += "<div class='folder-name rounded-top p-2 pl-2 pr-2 m-2'>";
     html += "<div class='form-label' for='folderName'><i class='fa fa-folder-open-o pr-2' aria-hidden='true'></i>Folder Name: ";
     html += "<input type='text' id='folderName' class='form-control' value='" + folderObj.name + "'/>";
     html += "<input type='hidden' id='folderId' value='" + folderObj.id + "'/>";
@@ -141,7 +168,7 @@ function onDeleteNote(noteId) {
         else if (!isNaN(noteDiv.id) && noteDiv.id == noteId) {
             // Delete from database and interface
             let url = "http://localhost:4000/api/notes/del/" + noteId;
-            ajaxCall(url, "DELETE", alert);
+            ajaxCall(url, "DELETE", reload);
         }
         else
             // Don't delete
@@ -154,7 +181,7 @@ function buildNoteHtml(title, content, noteId) {
     let html = "";
     if (!noteId) noteId = CreateGUID();
 
-    html += "<div id='" + noteId + "' name='noteDiv' class='w-100 pt-2 pl-2 pr-2 mb-3' style='background: lightyellow;'>";
+    html += "<div id='" + noteId + "' name='noteDiv' class='notes w-100 pt-2 pl-2 pr-2 mb-3'>";
     html += "<label class='form-label pl-2' for='noteTitle'><i class='fa fa-sticky-note-o pr-2'></i>Note Title</label>";
 
     html += "<div class='float-right'>";
@@ -164,7 +191,7 @@ function buildNoteHtml(title, content, noteId) {
 
     html += "<input type='text' class='form-control' value='" + title + "'/>";
     html += "<label class='form-label pl-2 pt-2' for='noteTitle'>Note Content</label>";
-    html += "<textarea class='w-100 pl-2 pr-2' style='background: rgba(244,236,194,05);'>" + content + "</textarea>";
+    html += "<textarea class='notes-content-textbox w-100 pl-2 pr-2'>" + content + "</textarea>";
     html += "</div>";
     return html;
 }
@@ -173,21 +200,22 @@ function processFolderNotes(response) {
     let html = "<div class='container-fluid'>";
     let folders = JSON.parse(response);
 
-    for (let i = 0; i < folders.length; i++) {
 
+
+    for (let i = 0; i < folders.length; i++) {
         var folderObj = folders[i];
         var folderJson = JSON.stringify(folderObj);
 
         if ((i % 3) == 0)
-
             html += "<div class='row mt-5 mb-5'>";
 
+
         // Printing Folders
-        html += "<div class='col-4'><div class='ml-1 p-2 roundeda' style='background: #808080; height: 220px; '>";
-        html += "<div class='rounded-pill p-2 m-1' style='background: #C4C4C4;'>" + folderObj.name;
+        html += "<div class='col-4'><div class='btn1 folder ml-1 p-2 roundeda' style='height: 220px;'>";
+        html += "<div class='folder-title rounded-pill p-2 m-1'>" + folderObj.name;
         html += "<div class='float-right'>";
-        html += "<button type='button' class='btn p-0 pr-1' data-toggle='tooltip' title='Add to Favorite'><i class='fa fa-star'></i></button>";
-        html += "<button type='button' class='btn p-0 pr-1' data-toggle='tooltip' title='Edit' onClick='onEditNotes(" + folderJson + ")'><i class='fa fa-pencil-square-o'></i></button>";
+        html += "<button type='button' class='btn p-0 pr-1 pb-1' data-toggle='tooltip' title='Edit' onClick='onEditNotes(" + folderJson + ")'><i class='fa fa-pencil-square-o'></i></button>";
+        html += "<button type='button' class='btn p-0 pr-1 pb-1' data-toggle='tooltip' title='Delete folder' onClick='onDeleteFolder(" + folderObj.id + ")'><i class='fa fa-trash'></i></button>";
         html += "</div>";
         html += "</div>";
 
@@ -200,7 +228,7 @@ function processFolderNotes(response) {
                 isRowNoteClosed = false;
             }
 
-            html += "<div class='col-3'><div style='background: #D9D9D9; height: 50px;'></div></div>";
+            html += "<div class='col-3'><div class='folder-notes' style='height: 50px;'></div></div>";
 
             if (((j + 1) % 4) == 0) {
                 html += "</div>"; //This is the notes row div
@@ -238,8 +266,8 @@ function onDeleteUser() {
 
 function profile() {
     let html = "<div class='row justify-content-center align-items-center h-100'>";
-    html += "<div class='col-12 col-lg-9 col-xl-7'>";
-    html += "<div class='card bg-dark text-white' style='border-radius: 15px;'>";
+    html += "<div class='col-12 col-lg-9 col-xl-7  pt-3'>";
+    html += "<div id = 'card' class='card border border-dark' style='border-radius: 30px;'>";
     html += "<div class='card-body p-4 p-md-5'>";
     html += "<h3 class='mb-4 pb-2 pb-md-0 mb-md-5'>Profile</h3>";
     html += "<div class='row'>";
@@ -295,6 +323,7 @@ function onProfileChange() {
 
     //Extracting theme type from radiobox
     let darkMode = false;
+
     for (let i = 0; i < themTypes.length; i++) {
         const themType = themTypes[i];
         if (themType.checked)
@@ -305,11 +334,13 @@ function onProfileChange() {
     let post = JSON.stringify({
         dark_mode: darkMode
     });
+
     ajaxCall(urlEditTheme, "PUT", null, post);
 
     post = JSON.stringify({
         password: password
     });
-    ajaxCall(urlEdit, "PUT", redirectToLoginPage, post);
+    ajaxCall(urlEdit, "PUT", null, post);
 
 }
+

@@ -1,0 +1,134 @@
+body {
+    font-family: sans-serif;
+}
+
+ul {
+    list-style-type: none;
+}
+
+/* Navigation */
+
+/* Dark mode */
+.nav-container {
+    background: #404040;
+}
+
+.body-container {
+
+    background: #404040;
+
+}
+
+.text {
+    color: white;
+}
+
+.gradient-custom {
+    /* fallback for old browsers */
+    background: #6a11cb;
+
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1));
+
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
+}
+
+#card {
+    background: #343a40;
+    color: white;
+}
+
+a {
+    color: white;
+}
+
+.loginBtn {
+    border: 2px solid white;
+}
+
+.form-control {
+    background-color: grey;
+}
+
+.menuBttn {
+    background: #D9D9D9;
+
+}
+
+.folder {
+    background: #808080;
+}
+
+.folder-title {
+    background: #C4C4C4;
+}
+
+.folder-notes {
+    background: #D9D9D9;
+    height: 50px
+}
+
+.folder-name {
+    background: #C4C4C4;
+}
+
+.notes {
+    background: #C4C4C4;
+}
+
+.notes-content-textbox {
+    background: #808080;
+}
+
+
+
+.roundeda {
+    border-radius: 31px;
+
+}
+
+.col img {
+    height: 100px;
+    width: 100%;
+    cursor: pointer;
+    transition: transform 1s;
+    object-fit: cover;
+}
+
+.col label {
+    overflow: hidden;
+    position: relative;
+}
+
+.imgbgchk:checked+label>.tick_container {
+    opacity: 1;
+}
+
+/* aNIMATION */
+.imgbgchk:checked+label>img {
+    transform: scale(1.25);
+    opacity: 0.3;
+}
+
+.tick_container {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    cursor: pointer;
+    text-align: center;
+}
+
+.tick {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    padding: 6px 12px;
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+}
