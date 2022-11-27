@@ -33,21 +33,6 @@ function placeContentInMainBody(html) {
     document.getElementById("main-body").innerHTML = html;
 }
 
-function ajaxCall(url, action, callback, post = null) {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open(action, url, true);
-    xmlhttp.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
-    xmlhttp.send(post);
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState === 4) {
-            if (xmlhttp.status === 200 || xmlhttp.status === 201) {
-                if (callback) callback(xmlhttp.responseText);
-            }
-            else
-                if (callback) callback("Error \n" + xmlhttp.responseText);
-        }
-    }
-}
 function alertAndReload(response) {
     alert(response);
     location.reload()
@@ -140,26 +125,30 @@ function onSaveNote(noteId) {
     const title = noteDiv.getElementsByTagName("input")[0].value;
     const content = noteDiv.getElementsByTagName("textarea")[0].value;
 
-    if (isNaN(noteId)) {
-        // Create a new note in database
-        let url = "http://localhost:4000/api/notes/create";
-        let post = JSON.stringify({
-            content: content,
-            title: title,
-            author: userId,
-            folder: folderId
-        });
-        ajaxCall(url, "POST", alert, post);
-    }
-    else {
-        // Update the note in database
-        let url = "http://localhost:4000/api/notes/edit/" + noteId;
-        let post = JSON.stringify({
-            newContent: content,
-            newTitle: title
-        });
-        ajaxCall(url, "PUT", alert, post);
-    }
+    if (title && content) {
+        if (isNaN(noteId)) {
+            // Create a new note in database
+            let url = "http://localhost:4000/api/notes/create";
+            let post = JSON.stringify({
+                content: content,
+                title: title,
+                author: userId,
+                folder: folderId
+            });
+            ajaxCall(url, "POST", alert, post);
+        }
+        else {
+            // Update the note in database
+            let url = "http://localhost:4000/api/notes/edit/" + noteId;
+            let post = JSON.stringify({
+                newContent: content,
+                newTitle: title
+            });
+            ajaxCall(url, "PUT", alert, post);
+        }
+    } else
+        alert("Title and content shouldn't be empty");
+
 }
 
 function onDeleteNote(noteId) {
@@ -174,7 +163,7 @@ function onDeleteNote(noteId) {
         else if (!isNaN(noteDiv.id) && noteDiv.id == noteId) {
             // Delete from database and interface
             let url = "http://localhost:4000/api/notes/del/" + noteId;
-            ajaxCall(url, "DELETE", reload);
+            ajaxCall(url, "DELETE", null);
         }
         else
             // Don't delete
@@ -351,4 +340,16 @@ function onProfileChange() {
     }
     else
         ajaxCall(urlEditTheme, "PUT", alertAndReload, post);
+}
+
+function onFolderDownload() {
+    const userId = localStorage.getItem('userId');
+    const url = "http://localhost:4000/api/folders/user/" + userId;
+    ajaxCall(url, "GET", saveJsonToFile);
+}
+
+function saveJsonToFile(response) {
+    var blob = new Blob([response],
+        { type: "text/plain;charset=utf-8" });
+    saveAs(blob, "static.txt");
 }
