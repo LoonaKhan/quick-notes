@@ -1,27 +1,33 @@
 window.onload = function () {
     const userId = localStorage.getItem('userId');
+    const currentTheme = localStorage.getItem('darkMode');
     document.getElementById("userName").innerHTML = localStorage.getItem('userName');
     document.getElementById("avatar").src = "img/" + localStorage.getItem('avatar');
 
+    // Set theme base on user's profile
+    toggleTheme(currentTheme);
+
     let url = "http://localhost:4000/api/folders/user/" + userId;
     ajaxCall(url, "GET", processFolderNotes);
-
-    // let currentTheme = localStorage.getItem('darkMode');
-    // toggleTheme(currentTheme);
-
 }
 
-// function toggleTheme(currentTheme) {
-//     debugger;
-//     var theme = document.getElementsByTagName('link')[0];
-//     theme.getAttribute('href') == 'css/Template-dark.css'
+function toggleTheme(currentTheme) {
+    let theme;
+    const themes = document.getElementsByTagName('link');
+    for (let i = 0; i < themes.length; i++) {
+        if (themes[i].id == 'theme')
+            theme = themes[i];
+    }
 
-//     if (currentTheme)
-//         theme.setAttribute('href', 'css/Template-dark.css');
-//     else
-//         theme.setAttribute('href', 'css/Template-light.css');
+    if (theme) {
+        if (currentTheme == "true")
+            theme.href = 'css/Template-dark.css';
+        else
+            theme.href = 'css/Template-light.css';
+    }
 
-// }
+
+}
 
 function placeContentInMainBody(html) {
     document.getElementById("main-body").innerHTML = html;
@@ -285,13 +291,13 @@ function profile() {
     html += "</div>";
     html += "<div class='col-3 d-flex align-items-center justify-content-center'>";
     html += "<div class='form-check'>";
-    html += "<input class='form-check-input' type='radio' name='themType' value='0'>";
+    html += "<input class='form-check-input' type='radio' name='themType' value=false>";
     html += "<label class='form-check-label' for='flexRadioDefault1'>Lightmode</label>";
     html += "</div>";
     html += "</div>";
     html += "<div class='col-3 d-flex align-items-center justify-content-center'>";
     html += "<div class='form-check'>";
-    html += "<input class='form-check-input' type='radio' name='themType' value='1' checked=''>";
+    html += "<input class='form-check-input' type='radio' name='themType' value=true checked=''>";
     html += "<label class='form-check-label' for='flexRadioDefault2'>Darkmode</label>";
     html += "</div>";
     html += "</div>";
@@ -331,15 +337,18 @@ function onProfileChange() {
 
     }
 
+    localStorage.setItem('darkMode', darkMode);
     let post = JSON.stringify({
         dark_mode: darkMode
     });
 
-    ajaxCall(urlEditTheme, "PUT", null, post);
-
-    post = JSON.stringify({
-        password: password
-    });
-    ajaxCall(urlEdit, "PUT", null, post);
-
+    if (password) {
+        ajaxCall(urlEditTheme, "PUT", null, post);
+        post = JSON.stringify({
+            password: password
+        });
+        ajaxCall(urlEdit, "PUT", alertAndReload, post);
+    }
+    else
+        ajaxCall(urlEditTheme, "PUT", alertAndReload, post);
 }
