@@ -10,7 +10,8 @@ User.init({ // todo: let charlie override this
         primaryKey: true
     },
     username: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        unique: true
     },
     dark_mode: {
         type: DataTypes.BOOLEAN

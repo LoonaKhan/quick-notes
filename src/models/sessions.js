@@ -9,7 +9,7 @@ class Session { // session class to keep track of user sessions
     }
 }
 
-const sessions = {} // the sessions. good enough for a small scale app
+const sessions = {} // session object to contain all current sessions
 
 module.exports = {
     Session,
