@@ -5,6 +5,7 @@
 const { Router } = require('express')
 const Folder = require('../database/Folder')
 const Note = require('../database/Note')
+const User = require('../database/User')
 
 const router = Router()
 
@@ -32,7 +33,6 @@ router.post('/create', async (req, res) => {
     /*
     Requires a uid, folder name, content and title fo the note
      */
-    // todo: the folder/user may not exist. add error
 
     const note = await Note.create(req.body)
     res.status(201).send(note)
@@ -90,6 +90,34 @@ router.post('/send/:note_id', async (req, res) =>{
     }
 })
 
+router.post('/send_macro/:note_id', async (req, res) => {
+    const {username} = req.body
+    const note_id = req.params.note_id
+
+    // sends the note to that inbox
+    try {
+        console.log("started")
+
+        const note = await Note.findOne({where: {id: note_id}})
+        console.log("found note")
+        const recipient = await User.findOne({where: {username: username}})
+        console.log("found recipient")
+        const inbox = await Folder.findOne({where: {owner: recipient.id, name: "inbox"}})
+        console.log("found inbox")
+
+        const sent_note = await Note.create({
+            author: note.author,
+            folder: inbox.id,
+            content: note.content,
+            title: note.title,
+            owner: note.owner
+        })
+        console.log("sent note")
+        res.status(201).send(sent_note)
+    } catch (e) {
+        res.status(400).send({err: e})
+    }
+})
 
 
 module.exports = router 

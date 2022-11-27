@@ -1,22 +1,23 @@
-const { Model, DataTypes} = require('sequelize')
+const { Model, DataTypes } = require('sequelize')
 const sequelize = require('./db')
 
-class User extends Model {}
+class User extends Model { }
 
 User.init({ // todo: let charlie override this
-    id:{
+    id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
     username: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        unique: true
     },
     dark_mode: {
         type: DataTypes.BOOLEAN
     },
     avatar: {
-        type: DataTypes.INTEGER
+        type: DataTypes.STRING
     },
     password: {
         type: DataTypes.STRING

@@ -22,7 +22,7 @@ const euclidean = (a,b) => { // assumes a and b are already ordered
         if (c === 0) {
             return b
         }
-        console.log(`a: ${a}, b: ${b}\nc: ${c}`)
+        //console.log(`a: ${a}, b: ${b}\nc: ${c}`)
         a = b
         b = c
     }
@@ -49,18 +49,22 @@ const egcd = (a, m) => {
         return [m, 0, 1]
     }
     else {
-        let g, y, x = egcd(m %a, a)
-        return [g, x - (m / a) * y, y]
+        let list = egcd(m %a, a)
+        console.log(list)
+        return [list[0], list[2] - (m / a) * list[1], list[1]]
     }
 }
 
 const modinv = (a,m) => { // todo: make this work.  https://en.wikibooks.org/wiki/Algorithm_Implementation/Mathematics/Extended_Euclidean_algorithm
-    let g, x, y = egcd(a, m)
-    if (g!==1){
+
+    console.log("modinv shortcut", a * (m-1) % m)
+    return a * (m-1) % m
+    let list = egcd(a, m)
+    if (list[0]!==1){
         return
     }
     else {
-        return x % m
+        return list[2] % m
     }
 }
 
@@ -77,6 +81,7 @@ module.exports = {
         tot_n = (p-1) * (q-1) // totient(n) = (p-1)(q-1) since n is composite and the product of both
 
         // e is a prime number less than tot_n
+        const e = 13 // just use a tiny ass number
 
         // determine d. it is the modular inverse of e and tot_n
         let d = modinv(e, tot_n)
@@ -96,8 +101,10 @@ module.exports = {
         const n = privKey['n']
         const d = privKey['d']
 
-        return Math.pow(msg, d) % n
+        return Math.pow(crypt, d) % n // handle big nums
     },
     msgToNum: (msg) => {},
-    NumTomsg: (crypted) => {}
+    NumTomsg: (crypted) => {},
+    modinv,
+    egcd
 }
