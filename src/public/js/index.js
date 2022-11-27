@@ -313,3 +313,17 @@ function onProfileChange() {
     ajaxCall(urlEdit, "PUT", redirectToLoginPage, post);
 
 }
+
+
+function onShareNote(noteId){ // shares a note to a recipient
+    const urlSend = "http://localhost:4000/api/notes/send_macro/" + noteId
+
+    // determines username of the recipient
+    const recipient = prompt("Which user should this note be shared to?")
+
+    const post = JSON.stringify({
+        username: recipient
+    })
+
+    ajaxCall(urlSend, "POST", alert, post)
+}
