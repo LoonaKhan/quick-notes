@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 27, 2022 at 07:43 AM
+-- Generation Time: Nov 27, 2022 at 07:52 AM
 -- Server version: 10.4.25-MariaDB
 -- PHP Version: 8.1.10
 
@@ -28,9 +28,9 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `folders` (
-  `Folder_ID` int(11) NOT NULL,
-  `Name` varchar(255) NOT NULL,
-  `Owner` int(11) NOT NULL
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `owner` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -40,9 +40,9 @@ CREATE TABLE `folders` (
 --
 
 CREATE TABLE `notes` (
-  `note_ID` int(11) NOT NULL,
-  `Title` varchar(255) NOT NULL,
-  `Content` text NOT NULL,
+  `id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `content` text NOT NULL,
   `folder` int(11) NOT NULL,
   `author` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -54,11 +54,11 @@ CREATE TABLE `notes` (
 --
 
 CREATE TABLE `user` (
-  `ID` int(11) NOT NULL,
-  `Username` varchar(255) NOT NULL,
-  `Password` varchar(255) NOT NULL,
-  `Avatar` int(11) NOT NULL,
-  `Dark_mode` tinyint(1) NOT NULL
+  `id` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `avatar` int(11) NOT NULL,
+  `dark_mode` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -69,14 +69,14 @@ CREATE TABLE `user` (
 -- Indexes for table `folders`
 --
 ALTER TABLE `folders`
-  ADD PRIMARY KEY (`Folder_ID`),
-  ADD KEY `Owner` (`Owner`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Owner` (`owner`);
 
 --
 -- Indexes for table `notes`
 --
 ALTER TABLE `notes`
-  ADD PRIMARY KEY (`note_ID`),
+  ADD PRIMARY KEY (`id`),
   ADD KEY `folder` (`folder`),
   ADD KEY `author` (`author`);
 
@@ -84,7 +84,7 @@ ALTER TABLE `notes`
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`ID`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -94,19 +94,19 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `folders`
 --
 ALTER TABLE `folders`
-  MODIFY `Folder_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `notes`
 --
 ALTER TABLE `notes`
-  MODIFY `note_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -122,7 +122,7 @@ ALTER TABLE `folders`
 -- Constraints for table `notes`
 --
 ALTER TABLE `notes`
-  ADD CONSTRAINT `notes_ibfk_1` FOREIGN KEY (`folder`) REFERENCES `folders` (`Folder_ID`),
+  ADD CONSTRAINT `notes_ibfk_1` FOREIGN KEY (`folder`) REFERENCES `folders` (`id`),
   ADD CONSTRAINT `notes_ibfk_2` FOREIGN KEY (`author`) REFERENCES `user` (`ID`);
 COMMIT;
 
